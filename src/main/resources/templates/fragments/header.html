@@ -1,0 +1,311 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title>Smart Hospital</title>-->
+
+<!--    &lt;!&ndash; ✅ Correct Bootstrap & FontAwesome imports &ndash;&gt;-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <script src="https://kit.fontawesome.com/4b6c8a41d0.js" crossorigin="anonymous"></script>-->
+
+<!--    <style>-->
+<!--        /* Sidebar styles */-->
+<!--        #sidebar {-->
+<!--            height: 100%;-->
+<!--            width: 250px;-->
+<!--            position: fixed;-->
+<!--            top: 0;-->
+<!--            left: -250px;-->
+<!--            background-color: #0d6efd;-->
+<!--            color: white;-->
+<!--            transition: 0.3s;-->
+<!--            z-index: 1000;-->
+<!--            padding-top: 60px;-->
+<!--        }-->
+
+<!--        #sidebar.active {-->
+<!--            left: 0;-->
+<!--        }-->
+
+<!--        #sidebar .sidebar-header {-->
+<!--            padding: 20px;-->
+<!--            background: #0b5ed7;-->
+<!--            text-align: center;-->
+<!--        }-->
+
+<!--        #sidebar a {-->
+<!--            color: white;-->
+<!--            display: block;-->
+<!--            padding: 12px 25px;-->
+<!--            text-decoration: none;-->
+<!--            font-weight: 500;-->
+<!--        }-->
+
+<!--        #sidebar a:hover {-->
+<!--            background-color: rgba(255, 255, 255, 0.2);-->
+<!--        }-->
+
+<!--        #overlay {-->
+<!--            position: fixed;-->
+<!--            display: none;-->
+<!--            top: 0;-->
+<!--            left: 0;-->
+<!--            height: 100%;-->
+<!--            width: 100%;-->
+<!--            background-color: rgba(0, 0, 0, 0.5);-->
+<!--            z-index: 999;-->
+<!--        }-->
+
+<!--        /* Adjust main content */-->
+<!--        #main-content {-->
+<!--            transition: margin-left 0.3s;-->
+<!--            padding: 20px;-->
+<!--        }-->
+
+<!--        .hamburger {-->
+<!--            background: none;-->
+<!--            border: none;-->
+<!--            color: white;-->
+<!--            font-size: 1.5rem;-->
+<!--            cursor: pointer;-->
+<!--            margin-right: 10px;-->
+<!--        }-->
+
+<!--        /* Navbar shadow for better UI */-->
+<!--        nav.navbar {-->
+<!--            box-shadow: 0 2px 6px rgba(0,0,0,0.2);-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+
+<!--<body>-->
+<!--<div th:fragment="header">-->
+<!--    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">-->
+<!--        <div class="container-fluid">-->
+<!--            &lt;!&ndash; ☰ Hamburger Icon for Logged-in Users &ndash;&gt;-->
+<!--            <button class="hamburger" th:if="${session.currentUser != null}" onclick="toggleSidebar()">-->
+<!--                <i class="fas fa-bars"></i>-->
+<!--            </button>-->
+
+<!--            &lt;!&ndash; Brand &ndash;&gt;-->
+<!--            <a class="navbar-brand" th:href="@{/home}">Smart Hospital</a>-->
+
+<!--            &lt;!&ndash; Navbar Items &ndash;&gt;-->
+<!--            <div class="collapse navbar-collapse" id="navbarNav">-->
+<!--                <ul class="navbar-nav ms-auto align-items-center">-->
+<!--                    <li class="nav-item" th:if="${session.currentUser == null}">-->
+<!--                        <a th:href="@{/home}" class="nav-link">Home</a>-->
+<!--                    </li>-->
+<!--                    <li class="nav-item" th:if="${session.currentUser == null}">-->
+<!--                        <a th:href="@{/doctors}" class="nav-link">Doctors</a>-->
+<!--                    </li>-->
+<!--                    <li class="nav-item" th:if="${session.currentUser == null}">-->
+<!--                        <a th:href="@{/register}" class="nav-link">Register</a>-->
+<!--                    </li>-->
+<!--                    <li class="nav-item" th:if="${session.currentUser == null}">-->
+<!--                        <a th:href="@{/login}" class="nav-link">Login</a>-->
+<!--                    </li>-->
+<!--                </ul>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </nav>-->
+
+<!--    &lt;!&ndash; Sidebar (Visible only if logged in) &ndash;&gt;-->
+<!--    <div id="sidebar" th:if="${session.currentUser != null}">-->
+<!--        <div class="sidebar-header">-->
+<!--            <h5>👤 User Dashboard</h5>-->
+<!--        </div>-->
+<!--        <div class="px-3">-->
+<!--            <p><strong>Username:</strong> <span th:text="${session.currentUser.username}"></span></p>-->
+<!--            <p><strong>Email:</strong> <span th:text="${session.currentUser.email}"></span></p>-->
+<!--            <p><strong>Role:</strong> <span th:text="${session.currentUser.role}"></span></p>-->
+<!--        </div>-->
+<!--        <hr class="bg-light">-->
+<!--        <a th:href="@{/profile/view}"><i class="fas fa-user"></i> View Profile</a>-->
+<!--        <a th:href="@{/profile/update}"><i class="fas fa-edit"></i> Update Profile</a>-->
+<!--        <a th:href="@{/appointments/my}" th:if="${session.currentUser.role == 'PATIENT'}"><i class="fas fa-calendar-check"></i> My Appointments</a>-->
+<!--        <a th:href="@{/logout}" class="text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Overlay &ndash;&gt;-->
+<!--    <div id="overlay" onclick="toggleSidebar()"></div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    function toggleSidebar() {-->
+<!--        const sidebar = document.getElementById("sidebar");-->
+<!--        const overlay = document.getElementById("overlay");-->
+<!--        const mainContent = document.getElementById("main-content");-->
+
+<!--        const isActive = sidebar.classList.toggle("active");-->
+<!--        overlay.style.display = isActive ? "block" : "none";-->
+<!--        if (mainContent) mainContent.style.marginLeft = isActive ? "250px" : "0";-->
+<!--    }-->
+<!--</script>-->
+
+<!--&lt;!&ndash; Bootstrap JS &ndash;&gt;-->
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--</body>-->
+<!--</html>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="header">
+
+
+    <!-- 🌟 GLOBAL TOAST -->
+    <div id="toast-container"></div>
+
+    <style>
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+        }
+
+        .toast-msg {
+            padding: 14px 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+            color: white;
+            font-weight: 500;
+            min-width: 250px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            animation: fadeInOut 3s ease forwards;
+        }
+
+        .toast-success { background-color: #28a745; }
+        .toast-error { background-color: #dc3545; }
+        .toast-warning { background-color: #ffc107; color: black; }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px);}
+            10% { opacity: 1; transform: translateY(0);}
+            90% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-20px);}
+        }
+    </style>
+
+    <script>
+        function showToast(message, type) {
+            const container = document.getElementById("toast-container");
+
+            const toast = document.createElement("div");
+            toast.className = "toast-msg toast-" + type;
+            toast.innerText = message;
+
+            container.appendChild(toast);
+
+            // Remove after animation
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+
+    <div th:if="${success}">
+        <script> showToast([[${success}]], 'success'); </script>
+    </div>
+    <div th:if="${error}">
+        <script> showToast([[${error}]], 'error'); </script>
+    </div>
+    <div th:if="${warning}">
+        <script> showToast([[${warning}]], 'warning'); </script>
+    </div>
+
+
+    <!-- 🔷 NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+
+            <a class="navbar-brand text-center" th:href="@{/home}">Smart Hospital</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+
+                    <!-- PATIENT MENU -->
+                    <li class="nav-item"
+                        th:if="${session.currentUser?.role == 'PATIENT'}">
+                        <a th:href="@{/appointments/my}" class="nav-link">My Slots</a>
+                    </li>
+
+                    <li class="nav-item"
+                        th:if="${session.currentUser?.role == 'PATIENT'}">
+                        <a th:href="@{/billing/my}" class="nav-link">My Bills</a>
+                    </li>
+
+                    <!-- PUBLIC MENU -->
+                    <li class="nav-item" th:if="${session.currentUser == null or session.currentUser.role == 'PATIENT'}">
+                        <a th:href="@{/home} + '#services'" class="nav-link">Departments</a>
+                    </li>
+
+                    <li class="nav-item" th:if="${session.currentUser == null or session.currentUser.role == 'PATIENT'}">
+                        <a th:href="@{/home} + '#contact'" class="nav-link">Contact</a>
+                    </li>
+
+                    <li class="nav-item" th:if="${session.currentUser == null or session.currentUser.role == 'PATIENT'}">
+                        <a th:href="@{/doctors}" class="nav-link">Doctors</a>
+                    </li>
+
+                    <!-- LOGIN / REGISTER -->
+                    <li class="nav-item" th:if="${session.currentUser == null}">
+                        <a th:href="@{/login}" class="nav-link ms-2">Login</a>
+                    </li>
+                    <li class="nav-item" th:if="${session.currentUser == null}">
+                        <a class="nav-link" th:href="@{/register}">Register</a>
+                    </li>
+
+                    <!-- USER DROPDOWN -->
+                    <li class="nav-item dropdown" th:if="${session.currentUser != null}">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown"
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-user-circle fa-lg me-1"></i>
+
+                            <span th:text="${#strings.substring(session.currentUser.username, 0, 3).toUpperCase()}"></span>
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="profileDropdown">
+                            <li>
+                                <h6 class="dropdown-header">
+                                    Hello, <span th:text="${session.currentUser.username}"></span>!
+                                </h6>
+                            </li>
+
+<!--                            <li><a class="dropdown-item" th:href="@{/profile/view}">View Profile</a></li>-->
+<!--                            <li><a class="dropdown-item" th:href="@{/profile/update}">Update Profile</a></li>-->
+<!--                           -->
+                            <li><a class="dropdown-item" th:if="${session.currentUser.role == 'ADMIN' }" th:href="@{/admin-dashboard}">Dashboard</a></li>
+
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li>
+                                <a class="dropdown-item text-danger" th:href="@{/logout}">Logout</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+
