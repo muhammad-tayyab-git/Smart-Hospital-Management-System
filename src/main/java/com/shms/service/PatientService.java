@@ -19,7 +19,7 @@ public class PatientService {
     }
 
     public Patient getPatientById(Long id) {
-        return patientRepository.findByUserId(id)
+        return patientRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid patient ID: " + id));
     }
 
