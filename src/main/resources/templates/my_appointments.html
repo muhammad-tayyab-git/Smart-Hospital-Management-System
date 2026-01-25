@@ -43,13 +43,16 @@
                 <td th:text="${slot.date}"></td>
                 <td th:text="${slot.startTime}"></td>
                 <td th:text="${slot.endTime}"></td>
-                <td>
+                <td th:if="${!slot.attended}">
                     <form th:action="@{/appointments/cancel/{id}(id=${slot.id})}" method="post">
                         <button type="submit" class="btn btn-danger btn-sm"
                                 onclick="return confirm('Are you sure you want to cancel this appointment?')">
                             Cancel
                         </button>
                     </form>
+                </td>
+                <td th:if="${slot.attended}">
+                    <span class="fw-semibold">Attended</span>
                 </td>
             </tr>
             </tbody>

@@ -5,7 +5,9 @@ import com.shms.entity.User;
 import com.shms.repository.BillRepository;
 import com.shms.repository.DoctorRepository;
 import com.shms.repository.PatientRepository;
+import com.shms.service.ActivityService;
 import com.shms.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,10 +26,12 @@ public class AuthController {
     @Autowired
     private final DoctorRepository doctorRepo;
     private final BillRepository billRepo;
-    public AuthController(AuthService authService, PatientRepository patientRepo, DoctorRepository doctorRepo, BillRepository billRepo) { this.authService = authService;
+    private final ActivityService activityService;
+    public AuthController(AuthService authService, PatientRepository patientRepo, DoctorRepository doctorRepo, BillRepository billRepo, ActivityService activityService) { this.authService = authService;
         this.patientRepo = patientRepo;
         this.doctorRepo = doctorRepo;
         this.billRepo = billRepo;
+        this.activityService = activityService;
     }
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
@@ -45,6 +49,7 @@ public class AuthController {
 
         if (success) {
             model.addAttribute("success", "Registration successful! Please login.");
+            activityService.publish("New Patient", patient.getFullName() + "has been registered.", "info");
             return "login";
         } else {
             model.addAttribute("error", "Username or Email already exists!");
@@ -70,7 +75,7 @@ public class AuthController {
                 return "home";
             } if(Objects.equals(u.getRole(), "DOCTOR")){
 
-                return "redirect:/doctors/dashboard";
+                return "doctor-dashboard";
 
             }
             return "redirect:/admin-dashboard";
@@ -82,11 +87,12 @@ public class AuthController {
 
 
     @GetMapping("/admin-dashboard")
-    public String dashboard(Model m) {
+    public String dashboard(HttpServletRequest request, Model m) {
         m.addAttribute("doctorsCount", doctorRepo.count());
         m.addAttribute("patientsCount", patientRepo.count());
         m.addAttribute("billsCount", billRepo.count());
         m.addAttribute("revenue", billRepo.totalRevenue());
+        m.addAttribute("currentUri", request.getRequestURI());
 
         // Example data — replace with real query
         m.addAttribute("patientsMonthly", List.of(10,12,15,9,20,18,22,30,25,28,35,40));
@@ -112,7 +118,9 @@ public class AuthController {
                 billRepo.countPaid(),
                 billRepo.countUnpaid()
         ));
+        // Load last 10 stored activities
 
+        m.addAttribute("activities", activityService.getRecentActivities());
         return "admin-dashboard";
     }
 

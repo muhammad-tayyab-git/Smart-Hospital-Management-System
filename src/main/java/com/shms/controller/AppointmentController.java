@@ -7,6 +7,7 @@ import com.shms.entity.User;
 import com.shms.repository.AppointmentSlotRepository;
 import com.shms.repository.DoctorRepository;
 import com.shms.repository.PatientRepository;
+import com.shms.service.ActivityService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,10 +26,17 @@ public class AppointmentController {
     @Autowired
     private AppointmentSlotRepository slotRepo;
 
+    ActivityService activityService;
     @Autowired
     private DoctorRepository doctorRepo;
     @Autowired
     private PatientRepository patientRepo;
+
+    public AppointmentController(ActivityService activityService) {
+        this.activityService = activityService;
+    }
+
+
     // 1️⃣  Show booking page with date form
     @GetMapping("/book")
     public String showBookingPage(
@@ -72,7 +80,7 @@ public class AppointmentController {
         slot.setAvailable(false);
         slot.setPatient(currentPatient);
         slotRepo.save(slot);
-
+        activityService.publish("New Appointment", currentPatient.getFullName() + " booked an appointment with " + slot.getDoctor().getFullName(), "warning");
         return "redirect:" + (referer != null ? referer : "/appointments/my");
     }
 
@@ -114,6 +122,7 @@ public class AppointmentController {
             slot.setAvailable(true);
             slot.setPatient(null);
             slotRepo.save(slot);
+            activityService.publish("Cancel Appointment", current.getFullName() + " Cancelled his appointment with " + slot.getDoctor().getFullName(), "warning");
         }
 
         return "redirect:/appointments/my";

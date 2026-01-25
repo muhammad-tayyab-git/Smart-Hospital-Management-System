@@ -1,0 +1,177 @@
+/* =========================
+   ADMIN UI STYLES
+========================= */
+
+/* Root variables */
+:root {
+    --bg-color: #f0f2f5;
+    --sidebar-bg: #343a40;
+    --card-bg: #fff;
+    --text-color: #333;
+    --primary-color: #007bff;
+}
+
+/* Dark mode */
+body.dark-mode {
+    --bg-color: #121212;
+    --sidebar-bg: #1e1e1e;
+    --card-bg: #1f1f1f;
+    --text-color: #e0e0e0;
+    --primary-color: #339af0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== Sidebar ===== */
+#sidebar {
+    height: 100vh;
+    width: 220px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: var(--sidebar-bg);
+    color: #fff;
+    padding-top: 20px;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+/* Sidebar collapsed */
+#sidebar.collapsed {
+    width: 60px;
+}
+
+#sidebar.collapsed h4 {
+    display: none; /* hide hospital name */
+}
+
+#sidebar.collapsed .nav-link span {
+    display: none; /* hide text labels */
+}
+
+#sidebar.collapsed .nav-link {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+#sidebar.collapsed .nav-link i {
+    margin-right: 0;
+    font-size: 1.4rem;
+}
+
+#sidebar .nav-link {
+    color: #ddd;
+    font-weight: 500;
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    padding: 10px 15px;
+    transition: background 0.3s;
+}
+
+#sidebar .nav-link i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+#sidebar .nav-link:hover {
+    background: #495057;
+    color: #fff;
+}
+
+#sidebar .nav-link.active {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+/* ===== Top Navbar ===== */
+#top-navbar {
+    margin-left: 220px;
+    padding: 15px 30px;
+    background: var(--card-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    transition: all 0.3s;
+}
+
+#top-navbar .btn {
+    font-size: 0.85rem;
+}
+
+#sidebar.collapsed + #top-navbar,
+#sidebar.collapsed ~ #content {
+    margin-left: 60px;
+}
+
+/* ===== Main content ===== */
+#content {
+    margin-left: 220px;
+    padding: 30px;
+    transition: all 0.3s;
+    min-height: calc(100vh - 60px); /* ensures content covers full height */
+}
+
+/* Center content in pages */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* ===== Dashboard / Cards ===== */
+.dashboard-card, .chart-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 25px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    color: var(--text-color);
+}
+
+.dashboard-card:hover, .chart-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.btn-outline-custom {
+    border-width: 2px;
+    font-weight: 500;
+}
+
+/* ===== Stat cards ===== */
+.stat-card {
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    color: #fff;
+}
+
+.stat-doctors { background: linear-gradient(135deg, #6a11cb, #2575fc); }
+.stat-patients { background: linear-gradient(135deg, #43cea2, #185a9d); }
+.stat-bills { background: linear-gradient(135deg, #f7971e, #ffd200); color: #333; }
+.stat-revenue { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+
+/* ===== Recent activities ===== */
+#activity { max-height: 500px; overflow-y: auto; }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    #sidebar { width: 60px; }
+    #sidebar .nav-link span { display: none; }
+    #content { margin-left: 60px; padding: 20px; }
+    #top-navbar { margin-left: 60px; padding: 10px 15px; }
+}

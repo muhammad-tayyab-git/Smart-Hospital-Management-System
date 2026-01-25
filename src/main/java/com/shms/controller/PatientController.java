@@ -4,7 +4,9 @@ import com.shms.entity.Patient;
 import com.shms.entity.User;
 import com.shms.repository.PatientRepository;
 import com.shms.repository.UserRepository;
+import com.shms.service.ActivityService;
 import com.shms.service.PatientService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,21 +22,24 @@ public class PatientController {
     private final PatientService patientService;
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
+    private final ActivityService activityService;
 
-    public PatientController(PatientService patientService, PatientRepository patientRepository, UserRepository userRepository) {
+    public PatientController(PatientService patientService, PatientRepository patientRepository,
+                             UserRepository userRepository, ActivityService activityService) {
         this.patientService = patientService;
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
+        this.activityService = activityService;
     }
 
-    // 🩺 List all patients
     @GetMapping
-    public String listPatients(Model model) {
+    public String listPatients(Model model, HttpServletRequest request) {
         model.addAttribute("patients", patientService.getAllPatients());
-        return "patients";  //
+        model.addAttribute("currentUri", request.getRequestURI());
+//        activityService.publish("View Patients", "Viewed list of all patients", "info");
+        return "patients";
     }
 
-    // ➕ Show form to add a patient
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("patient", new Patient());
@@ -42,39 +47,35 @@ public class PatientController {
         return "patient_form";
     }
 
-    // 💾 Save a new patient
     @PostMapping("/add")
-    public String savePatient(@ModelAttribute("patient") Patient patient,
-                              @ModelAttribute("user") User user) {
-
+    public String savePatient(@ModelAttribute Patient patient, @ModelAttribute User user) {
         user.setRole("PATIENT");
         User savedUser = userRepository.save(user);
-
         patient.setUser(savedUser);
         patientService.savePatient(patient);
+
+        activityService.publish("Add Patient", "Added new patient: " + patient.getFullName(), "success");
 
         return "redirect:/patients";
     }
 
-    // ✏️ Edit patient form
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
+    public String showEditForm(@PathVariable Long id, Model model,RedirectAttributes ra) {
         Patient patient = patientService.getPatientById(id);
         model.addAttribute("patient", patient);
-        model.addAttribute("user", patient.getUser());
+        User user = patient.getUser();
+        model.addAttribute("user", user);
+
         return "patient_form";
     }
 
-    // 💾 Update patient
     @PostMapping("/update/{id}")
     public String updatePatient(@PathVariable Long id,
-                                @ModelAttribute("patient") Patient patient,
-                                @ModelAttribute("user") User user) {
+                                @ModelAttribute Patient patient,
+                                @ModelAttribute User user) {
 
         Patient existing = patientService.getPatientById(id);
         User existingUser = existing.getUser();
-
-        // Update user info
         existingUser.setUsername(user.getUsername());
         existingUser.setEmail(user.getEmail());
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
@@ -82,7 +83,6 @@ public class PatientController {
         }
         userRepository.save(existingUser);
 
-        // Update patient info
         existing.setFullName(patient.getFullName());
         existing.setGender(patient.getGender());
         existing.setAge(patient.getAge());
@@ -90,45 +90,35 @@ public class PatientController {
         existing.setAddress(patient.getAddress());
         existing.setEmail(patient.getEmail());
         existing.setMedicalHistory(patient.getMedicalHistory());
-
         patientService.savePatient(existing);
+
+        activityService.publish("Update Patient", "(ADMIN) Updated patient: " + existing.getFullName(), "warning");
+
         return "redirect:/patients";
     }
 
-    // ❌ Delete patient
     @GetMapping("/delete/{id}")
-    public String deletePatient(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+    public String deletePatient(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         Optional<Patient> optPatient = patientRepository.findById(id);
 
         if (optPatient.isPresent()) {
             Patient patient = optPatient.get();
             User user = patient.getUser();
 
-
-
-
-
-
             try {
-                // Delete patient first (foreign key constraint)
                 patientRepository.delete(patient);
+                if (user != null) userRepository.delete(user);
+                activityService.publish("Delete Patient", "(ADMIN) Deleted patient: " + patient.getFullName(), "danger");
                 redirectAttributes.addFlashAttribute("success", "Patient deleted successfully!");
-                // Delete linked user
-                if (user != null) {
-                    userRepository.delete(user);
-                }
             } catch (DataIntegrityViolationException e) {
                 redirectAttributes.addFlashAttribute("error",
                         "Cannot delete patient. They have scheduled appointments.");
             }
 
-       } else {
+        } else {
             redirectAttributes.addFlashAttribute("error", "Patient not found for ID: " + id);
         }
 
         return "redirect:/patients";
     }
-
-
-
 }
