@@ -1,0 +1,38 @@
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.env
+
+# Logs
+*.log
+logs/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Runtime / uploads
+uploads/
+data/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Test / coverage output
+surefire-reports/
+failsafe-reports/
+jacoco.exec

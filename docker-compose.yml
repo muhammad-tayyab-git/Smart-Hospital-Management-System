@@ -3,17 +3,25 @@ services:
     image: mysql:8.4
     container_name: shms_mysql
     restart: unless-stopped
+
     environment:
       MYSQL_DATABASE: smart_hospital
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-      MYSQL_USER: ${DB_USERNAME:-shms_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-change-me}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}
+      MYSQL_USER: ${DB_USERNAME:?DB_USERNAME must be set}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
+
     ports:
-      - "3306:3306"
+      - "3307:3306"
+
     volumes:
       - shms_mysql_data:/var/lib/mysql
+
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent"]
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent"
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -23,16 +31,23 @@ services:
     build: .
     container_name: smart_hospital
     restart: unless-stopped
+
     depends_on:
       mysql:
         condition: service_healthy
+
     environment:
       DB_URL: jdbc:mysql://mysql:3306/smart_hospital?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      DB_USERNAME: ${DB_USERNAME:-shms_user}
-      DB_PASSWORD: ${DB_PASSWORD:-change-me}
-      FLYWAY_ENABLED: "true"
+      DB_USERNAME: ${DB_USERNAME:?DB_USERNAME must be set}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
+
+      FLYWAY_ENABLED: ${FLYWAY_ENABLED:-true}
       PORT: ${PORT:-8080}
+
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      SESSION_TIMEOUT: ${SESSION_TIMEOUT:-60m}
+      HEALTH_SHOW_DETAILS: ${HEALTH_SHOW_DETAILS:-never}
+
     ports:
       - "${PORT:-8080}:${PORT:-8080}"
 
