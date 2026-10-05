@@ -1,25 +1,75 @@
+# Smart Hospital Management System
 
-# Smart Hospital Management System (SHMS) - Starter (Spring Boot + Thymeleaf + MySQL)
+A portfolio-grade hospital operations web application built with **Java 17, Spring Boot 3.3, Thymeleaf, Bootstrap 5 and MySQL**.
 
-## What's included
-- Basic login (session-based), CRUD for Patients, Doctors, Appointments and Bills.
-- Thymeleaf templates with Bootstrap UI.
-- MySQL configuration placeholders (application.properties).
-- Sample users inserted via data.sql.
+## Product scope
 
-## Setup
-1. Create MySQL database named `shms_db`:
-   - In MySQL Workbench: `CREATE DATABASE shms_db;`
-2. Update `src/main/resources/application.properties` with your DB credentials.
-3. INSERT INTO users (id, username, password, role) VALUES (1, 'admin', 'admin123', 'ADMIN');
+The system is designed around role-based hospital workflows:
 
-Run this query for the admin enrollment and after that you can add doctors,patients etc and manage the things.
-And set JDK version to 17.
-4. Run:
-   ```bash
-   mvn spring-boot:run
-   ```
-5. Open `http://localhost:8080` and login (sample users in data.sql).
+- Patient registration and email-based login
+- Role-aware dashboards
+- Doctor directory and appointment booking
+- Patient and doctor management
+- Appointment status workflows
+- Billing and invoice views
+- Activity/audit tracking
+- Responsive Bootstrap UI
+- Environment-based database configuration
+- MySQL schema validation with `ddl-auto=validate`
 
-Notes: Passwords are plain text for starter only. Swap to Spring Security + hashing before production.
+### Roles
 
+`ADMIN`, `DOCTOR`, `RECEPTIONIST`, `NURSE`, `PHARMACIST`, `LAB_TECHNICIAN`, `PATIENT`
+
+Public registration creates **patients only**. Staff accounts should be created/assigned by an administrator.
+
+## Local setup
+
+1. Create/import the `smart_hospital` MySQL database and grant the application user access.
+2. Copy `.env.example` to `.env` for your own reference, but export the variables in the shell because Spring Boot does not automatically load a `.env` file.
+3. Set:
+
+```bash
+export DB_URL='jdbc:mysql://127.0.0.1:3306/smart_hospital?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC'
+export DB_USERNAME='shms_user'
+export DB_PASSWORD='your-local-password'
+export PORT=8080
+```
+
+4. Build:
+
+```bash
+mvn clean package
+```
+
+5. Run:
+
+```bash
+mvn spring-boot:run
+```
+
+6. Open `http://localhost:8080`.
+
+## Architecture
+
+The application follows a conventional Spring MVC structure:
+
+```text
+controller -> service -> repository -> entity
+                    \-> DTOs / view models
+templates + static assets -> Thymeleaf UI
+MySQL -> relational persistence
+```
+
+## Production notes
+
+- Never commit real database credentials.
+- Use managed MySQL/PostgreSQL for production.
+- Add versioned Flyway migrations before enabling Flyway in production.
+- Store patient uploads in object storage rather than the application filesystem.
+- Use HTTPS and secure session/cookie settings in production.
+- Replace demo credentials before deployment.
+
+## Portfolio highlights
+
+This project demonstrates full-stack Java development, relational database design, MVC architecture, role-based workflows, server-rendered responsive UI, validation, authentication, and production-oriented configuration.

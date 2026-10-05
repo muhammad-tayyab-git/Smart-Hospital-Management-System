@@ -1,235 +1,37 @@
 package com.shms.controller;
 
-import com.shms.entity.AppointmentSlot;
-import com.shms.entity.Doctor;
-import com.shms.entity.Patient;
-import com.shms.entity.User;
-import com.shms.repository.AppointmentSlotRepository;
-import com.shms.repository.DoctorRepository;
-import com.shms.repository.UserRepository;
-import com.shms.service.AppointmentService;
-import com.shms.service.BillingService;
+import com.shms.entity.*;
+import com.shms.repository.*;
 import com.shms.service.ActivityService;
+import com.shms.service.BillingService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
-@Controller
-@RequestMapping("/doctors")
+@Controller @RequestMapping("/doctors")
 public class DoctorController {
-    private final DoctorRepository doctorRepository;
-    private final ResourceLoader resourceLoader;
-
-    @Autowired
-    private AppointmentService appointmentService;
-
-    @Autowired
-    private BillingService billingService;
-
-    @Autowired
-    private AppointmentSlotRepository slotRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ActivityService activityService;
-
-    @Autowired
-    public DoctorController(DoctorRepository doctorRepository, ResourceLoader resourceLoader,
-                            AppointmentService appointmentService) {
-        this.doctorRepository = doctorRepository;
-        this.resourceLoader = resourceLoader;
-        this.appointmentService = appointmentService;
-    }
-
-    @GetMapping
-    public String list(Model model) {
-        model.addAttribute("doctors", doctorRepository.findAll());
-//        activityService.publish("View Doctors", "Viewed the list of doctors", "info");
-        return "doctors";
-    }
-
-    @GetMapping("/addDoctor")
-    public String addDoctor(Model model) {
-        model.addAttribute("doctor", new Doctor());
-        model.addAttribute("user", new User());
-        return "doctor_form";
-    }
-
-    @PostMapping("/addDoctor")
-    public String saveDoctor(@ModelAttribute Doctor doctor,
-                             @ModelAttribute User user,
-                             @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
-
-        // Save image
-        String uploadDir = new File("uploads/images/").getAbsolutePath();
-        new File(uploadDir).mkdirs();
-        String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
-        File dest = new File(uploadDir, fileName);
-        imageFile.transferTo(dest);
-
-        // Save user and doctor
-        user.setRole("DOCTOR");
-        User savedUser = userRepository.save(user);
-        doctor.setUser(savedUser);
-        doctor.setImagePath("/uploads/images/" + fileName);
-        doctor.setActive(true);
-        Doctor savedDoctor = doctorRepository.save(doctor);
-
-        // Generate slots
-        appointmentService.generateSlotsForDoctor(savedDoctor);
-
-        activityService.publish("Add Doctor", "(ADMIN) Added new doctor: " + doctor.getFullName(), "success");
-
-        return "redirect:/doctors";
-    }
-
-    @GetMapping("/edit/{id}")
-    public String editDoctorForm(@PathVariable Long id, Model model) {
-        Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid doctor ID: " + id));
-        model.addAttribute("doctor", doctor);
-        model.addAttribute("user", doctor.getUser());
-        return "doctor_form";
-    }
-
-    @PostMapping("/updateDoctor/{id}")
-    public String updateDoctor(@PathVariable Long id,
-                               @ModelAttribute Doctor doctor,
-                               @ModelAttribute User user,
-                               @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
-
-        Doctor existingDoctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid doctor ID: " + id));
-
-        User existingUser = existingDoctor.getUser();
-        existingUser.setUsername(user.getUsername());
-        existingUser.setEmail(user.getEmail());
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            existingUser.setPassword(user.getPassword());
-        }
-        userRepository.save(existingUser);
-
-        existingDoctor.setFullName(doctor.getFullName());
-        existingDoctor.setSpecialization(doctor.getSpecialization());
-        existingDoctor.setExperience(doctor.getExperience());
-        existingDoctor.setActive(doctor.isActive());
-
-        if (imageFile != null && !imageFile.isEmpty()) {
-            String uploadDir = new File("uploads/images/").getAbsolutePath();
-            new File(uploadDir).mkdirs();
-            String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
-            File dest = new File(uploadDir, fileName);
-            imageFile.transferTo(dest);
-            if (existingDoctor.getImagePath() != null) {
-                File oldFile = new File("." + existingDoctor.getImagePath());
-                if (oldFile.exists()) oldFile.delete();
-            }
-            existingDoctor.setImagePath("/uploads/images/" + fileName);
-        }
-
-        doctorRepository.save(existingDoctor);
-        activityService.publish("Update Doctor", "(ADMIN) Updated doctor: " + existingDoctor.getFullName(), "warning");
-
-        return "redirect:/doctors";
-    }
-
-    @GetMapping("/delete/{id}")
-    public String deleteDoctor(@PathVariable Long id) {
-        doctorRepository.findById(id).ifPresent(doctor -> {
-            if (doctor.getImagePath() != null) {
-                File imageFile = new File("." + doctor.getImagePath());
-                if (imageFile.exists()) imageFile.delete();
-            }
-            doctorRepository.delete(doctor);
-            activityService.publish("Delete Doctor", "(ADMIN) Deleted doctor: " + doctor.getFullName(), "danger");
-        });
-        return "redirect:/doctors";
-    }
-    @GetMapping("/dashboard")
-    public String doctorDashboard(Model model, HttpSession session,
-                                  @RequestParam(value = "date", required = false)
-                                  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        // 1️⃣ Get logged-in user from session
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null || !"DOCTOR".equals(currentUser.getRole())) {
-            return "redirect:/login";
-            // not logged in or not a doctor
-        }
-            // 2️⃣ Fetch doctor linked to user
-        Doctor doctor = doctorRepository.findByUserId(currentUser.getId());
-        if (doctor == null) { return "redirect:/login";
-            // doctor not found
-        }
-        model.addAttribute("doctor", doctor);
-        // 3️⃣ Get appointment slots for selected date
-        List<AppointmentSlot> slots = new ArrayList<>();
-        if (date != null) {
-            slots = slotRepository.findByDoctorAndDate(doctor, date);
-            model.addAttribute("selectedDate", date);
-        } else {
-            model.addAttribute("selectedDate", LocalDate.now());
-        }
-        model.addAttribute("slots", slots);
-        return "doctor-dashboard";
-    }
-    @PostMapping("/mark-attended/{slotId}")
-    @ResponseBody
-    public String markAsAttended(@PathVariable Long slotId, HttpSession session) {
-        AppointmentSlot slot = slotRepository.findById(slotId).orElse(null);
-        User currentUser = (User) session.getAttribute("currentUser");
-        Doctor doctor = doctorRepository.findByUserId(currentUser.getId());
-        if (slot != null && slot.isBooked()) {
-            slot.setAttended(true);
-            slotRepository.save(slot);
-            // create bill (amount strategy: fixed fee or doctor-specific)
-            double amount = 25.0;
-            // or derive from doctor/department
-            String desc = "Consultation with " + slot.getDoctor().getFullName() + " on " + slot.getDate();
-            billingService.createBillForAppointment(slot, amount, desc);
-            activityService.publish("Appointment Attended", "Dr. "+ doctor.getFullName()+" has marked slot # " + slotId+" as Attended.", "danger");
-            return "success";
-        }
-        return "error";
-    }
-    @PostMapping("/cancel-appointment/{slotId}")
-    @ResponseBody
-    public String cancelAppointment(@PathVariable Long slotId, HttpSession session) {
-        AppointmentSlot slot = slotRepository.findById(slotId).orElse(null);
-        User currentUser = (User) session.getAttribute("currentUser");
-        Doctor doctor = doctorRepository.findByUserId(currentUser.getId());
-        if (slot != null && slot.isBooked()) {
-            slot.setBooked(false);
-            slot.setAvailable(true);
-            slot.setPatient(null);
-            slotRepository.save(slot);
-            activityService.publish("Appointment Cancelled", "Dr. "+ doctor.getFullName()+" has marked slot # " + slotId+" as Cancelled.", "info");
-            return "success";
-        }
-        return "error";
-    }
-    // Toggle slot availability
-    @PostMapping("/toggle-slot/{slotId}")
-    @ResponseBody
-    public String toggleSlot(@PathVariable Long slotId) {
-        AppointmentSlot slot = slotRepository.findById(slotId).orElse(null);
-        if (slot != null) {
-            slot.setAvailable(!slot.isAvailable());
-            slotRepository.save(slot);
-            return "success";
-        }
-        return "error";
-    }
+ private final DoctorRepository doctors; private final UserRepository users; private final DepartmentRepository departments; private final com.shms.repository.RoleRepository roles; private final AppointmentSlotRepository appointments; private final PasswordEncoder encoder; private final ActivityService activities; private final BillingService billing;
+ public DoctorController(DoctorRepository d,UserRepository u,DepartmentRepository dep,com.shms.repository.RoleRepository r,AppointmentSlotRepository a,PasswordEncoder e,ActivityService x,BillingService b){doctors=d;users=u;departments=dep;roles=r;appointments=a;encoder=e;activities=x;billing=b;}
+ @GetMapping public String list(Model model){model.addAttribute("doctors",doctors.findAll());return "doctors";}
+ @GetMapping("/addDoctor") public String add(Model model){model.addAttribute("doctor",new Doctor());model.addAttribute("user",new User());model.addAttribute("departments",departments.findAll());return "doctor_form";}
+ @PostMapping("/addDoctor") public String save(@ModelAttribute Doctor doctor,@ModelAttribute User user,@RequestParam(required=false) Long departmentId,@RequestParam(value="imageFile",required=false) MultipartFile image) throws Exception{
+   user.setPassword(encoder.encode(user.getPassword()));user.setFirstName(user.getFirstName()==null?"Doctor":user.getFirstName());user.setLastName(user.getLastName()==null?"":user.getLastName());
+   Role role=roles.findByName("DOCTOR").orElseThrow();user.getRoles().clear();user.getRoles().add(role);User saved=users.save(user);doctor.setUser(saved);doctor.setDoctorNumber("DOC-"+String.format("%06d",saved.getId()));doctor.setDepartment(departments.findById(departmentId==null?1L:departmentId).orElseThrow());doctor.setStatus(Doctor.Status.ACTIVE);doctors.save(doctor);activities.publish("Doctor created: "+doctor.getFullName(),saved.getEmail(),"SUCCESS");return "redirect:/doctors";
+ }
+ @GetMapping("/edit/{id}") public String edit(@PathVariable Long id,Model model){Doctor d=doctors.findById(id).orElseThrow();model.addAttribute("doctor",d);model.addAttribute("user",d.getUser());model.addAttribute("departments",departments.findAll());return "doctor_form";}
+ @PostMapping("/updateDoctor/{id}") public String update(@PathVariable Long id,@ModelAttribute Doctor form,@ModelAttribute User formUser,@RequestParam(required=false) Long departmentId){Doctor d=doctors.findById(id).orElseThrow();User u=d.getUser();if(formUser.getFirstName()!=null&&!formUser.getFirstName().isBlank())u.setFirstName(formUser.getFirstName());if(formUser.getLastName()!=null&&!formUser.getLastName().isBlank())u.setLastName(formUser.getLastName());if(formUser.getEmail()!=null&&!formUser.getEmail().isBlank())u.setEmail(formUser.getEmail());if(formUser.getPhone()!=null)u.setPhone(formUser.getPhone());if(formUser.getPassword()!=null&&!formUser.getPassword().isBlank())u.setPassword(encoder.encode(formUser.getPassword()));users.save(u);d.setSpecialization(form.getSpecialization());d.setExperience(form.getExperience());d.setDepartment(departments.findById(departmentId==null?d.getDepartment().getId():departmentId).orElse(d.getDepartment()));d.setStatus(form.isActive()?Doctor.Status.ACTIVE:Doctor.Status.INACTIVE);doctors.save(d);return "redirect:/doctors";}
+ @GetMapping("/delete/{id}") public String delete(@PathVariable Long id){doctors.findById(id).ifPresent(d->doctors.delete(d));return "redirect:/doctors";}
+ @GetMapping("/dashboard") public String dashboard(HttpSession session,Model model,@RequestParam(required=false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate date){User u=current(session);if(u==null||!"DOCTOR".equals(u.getRole()))return "redirect:/login";Doctor d=doctors.findByUserId(u.getId());if(d==null)return "redirect:/login";LocalDate day=date==null?LocalDate.now():date;model.addAttribute("doctor",d);model.addAttribute("selectedDate",day);model.addAttribute("slots",appointments.findByDoctorAndDate(d,day));return "doctor-dashboard";}
+ @PostMapping("/mark-attended/{id}") @ResponseBody public String attended(@PathVariable Long id,HttpSession s){Doctor d=doctor(s);if(d==null)return "error";return appointments.findById(id).filter(a->a.getDoctor().getId().equals(d.getId())).map(a->{a.setStatus(AppointmentSlot.AppointmentStatus.COMPLETED);appointments.save(a);if(a.getPatient()!=null)billing.createBillForAppointment(a,d.getConsultationFee()==null?0:d.getConsultationFee().doubleValue(),"Consultation");return "success";}).orElse("error");}
+ @PostMapping("/cancel-appointment/{id}") @ResponseBody public String cancel(@PathVariable Long id,HttpSession s){Doctor d=doctor(s);if(d==null)return "error";return appointments.findById(id).filter(a->a.getDoctor().getId().equals(d.getId())).map(a->{a.setStatus(AppointmentSlot.AppointmentStatus.CANCELLED);appointments.save(a);return "success";}).orElse("error");}
+ @PostMapping("/toggle-slot/{id}") @ResponseBody public String toggle(@PathVariable Long id,HttpSession s){return "error";}
+ private User current(HttpSession s){Object o=s.getAttribute("currentUser");return o instanceof User?(User)o:null;}
+ private Doctor doctor(HttpSession s){User u=current(s);return u==null?null:doctors.findByUserId(u.getId());}
 }

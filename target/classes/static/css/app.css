@@ -1,0 +1,39 @@
+:root{
+  --sh-primary:#0b5cab;
+  --sh-primary-2:#146cce;
+  --sh-accent:#11a99a;
+  --sh-ink:#142033;
+  --sh-muted:#69778c;
+  --sh-bg:#f4f7fb;
+  --sh-surface:#ffffff;
+  --sh-border:#e5ebf3;
+  --sh-shadow:0 12px 34px rgba(18,42,76,.08);
+  --sh-radius:20px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--sh-bg);color:var(--sh-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.6}
+a{text-decoration:none}
+.navbar.sh-navbar{background:linear-gradient(110deg,#073b78,#0b5cab 55%,#109c91)!important;box-shadow:0 8px 30px rgba(7,59,120,.18);padding:.85rem 0}
+.sh-navbar .navbar-brand{font-weight:850;letter-spacing:-.35px}
+.sh-navbar .nav-link{color:rgba(255,255,255,.86)!important;font-weight:600;padding:.55rem .7rem!important;border-radius:10px}
+.sh-navbar .nav-link:hover{background:rgba(255,255,255,.1);color:#fff!important}
+.brand-mark{box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.hero-section{position:relative;isolation:isolate;min-height:590px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(120deg,rgba(4,39,78,.88),rgba(9,91,171,.68),rgba(10,151,139,.6)),url('/images/hospital1.jpeg') center/cover no-repeat}
+.hero-section:after{content:"";position:absolute;inset:auto -10% -35% -10%;height:280px;background:rgba(255,255,255,.08);filter:blur(30px);transform:rotate(-4deg);z-index:-1}
+.hero-section h1{font-size:clamp(2.5rem,6vw,5rem);font-weight:900;letter-spacing:-.055em;line-height:1.02;text-shadow:0 8px 30px rgba(0,0,0,.18)}
+.hero-section p{font-size:clamp(1rem,2vw,1.35rem);max-width:680px;margin:1.25rem auto;color:rgba(255,255,255,.9)}
+.section-title{color:var(--sh-primary);font-weight:850;letter-spacing:-.03em;margin-bottom:1.6rem}
+.metric-card,.content-card,.quick-card{background:var(--sh-surface);border:1px solid var(--sh-border);border-radius:var(--sh-radius);box-shadow:var(--sh-shadow)}
+.metric-card{padding:20px;position:relative;overflow:hidden;min-height:125px}
+.metric-card span{display:block;color:var(--sh-muted);font-size:.85rem;font-weight:650}.metric-card strong{display:block;font-size:2rem;margin-top:9px}.metric-card i{position:absolute;right:18px;bottom:16px;font-size:2rem;color:#dce9ff}
+.content-card{padding:24px}.section-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.section-heading h4{margin:0;font-weight:800}
+.list-stack{display:grid;gap:10px}.appointment-row{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid var(--sh-border);border-radius:14px;background:#fff}
+.appointment-row small{display:block;color:var(--sh-muted);margin-top:3px}.icon-bubble{width:42px;height:42px;border-radius:13px;background:#edf4ff;color:var(--sh-primary);display:grid;place-items:center}
+.status-pill{font-size:.73rem;font-weight:750;padding:6px 10px;border-radius:999px;background:#eef1f5;color:#667085}.status-pill.success{background:#e6f8ef;color:#12804a}.status-pill.warning{background:#fff4dc;color:#a46100}.status-pill.neutral{background:#edf2f7;color:#596579}
+.empty-state{text-align:center;padding:35px 15px;color:var(--sh-muted)}.empty-state i{font-size:2rem}.empty-state p{margin:10px 0 15px}
+.quick-card{display:block;padding:26px;color:var(--sh-ink);height:100%;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}.quick-card:hover{transform:translateY(-4px);box-shadow:0 18px 42px rgba(20,42,80,.12);border-color:#c6d9f5;color:var(--sh-primary)}
+.quick-card i{font-size:1.8rem;color:var(--sh-primary)}.quick-card h5{margin:15px 0 7px;font-weight:800}.quick-card p{color:var(--sh-muted);margin:0}
+.form-control,.form-select{border-color:#dce4ef;border-radius:12px;padding:.72rem .85rem}.form-control:focus,.form-select:focus{border-color:#6ca5e8;box-shadow:0 0 0 .2rem rgba(20,108,206,.12)}
+.btn{border-radius:11px;font-weight:700}.btn-primary{background:var(--sh-primary-2);border-color:var(--sh-primary-2)}.btn-primary:hover{background:#095aa9;border-color:#095aa9}
+.footer{background:linear-gradient(135deg,#082f5d,#0b5cab 70%,#087e73)!important}
+@media(max-width:768px){.hero-section{min-height:520px}.hero-section .btn{width:100%;max-width:320px}.metric-card{min-height:105px}.metric-card strong{font-size:1.6rem}.content-card{padding:18px}}

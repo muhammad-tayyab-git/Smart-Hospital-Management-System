@@ -1,0 +1,3 @@
+package com.shms.controller;
+import com.shms.entity.User;import jakarta.servlet.http.HttpSession;import org.springframework.stereotype.Controller;import org.springframework.ui.Model;import org.springframework.web.bind.annotation.GetMapping;
+@Controller public class StaffDashboardController{@GetMapping("/staff-dashboard")public String dashboard(HttpSession s,Model m){Object o=s.getAttribute("currentUser");if(!(o instanceof User u)||!(u.getRole().equals("NURSE")||u.getRole().equals("PHARMACIST")||u.getRole().equals("LAB_TECHNICIAN")))return "redirect:/login";m.addAttribute("user",u);return "staff-dashboard";}}

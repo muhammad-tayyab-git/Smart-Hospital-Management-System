@@ -1,0 +1,30 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: shms_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: smart_hospital
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - shms_mysql_data:/var/lib/mysql
+      - ./database/smart_hospital_v2.sql:/docker-entrypoint-initdb.d/01_smart_hospital.sql:ro
+
+  app:
+    build: .
+    container_name: smart_hospital
+    depends_on:
+      - mysql
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/smart_hospital?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: shms_user
+      DB_PASSWORD: ChangeThisPassword123!
+      JPA_DDL_AUTO: validate
+      PORT: 8080
+    ports:
+      - "8080:8080"
+
+volumes:
+  shms_mysql_data:

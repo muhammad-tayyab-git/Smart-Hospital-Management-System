@@ -1,33 +1,3 @@
 package com.shms.service;
-
-import com.shms.entity.Patient;
-import com.shms.repository.PatientRepository;
-import org.springframework.stereotype.Service;
-import java.util.List;
-
-@Service
-public class PatientService {
-
-    private final PatientRepository patientRepository;
-
-    public PatientService(PatientRepository patientRepository) {
-        this.patientRepository = patientRepository;
-    }
-
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
-    }
-
-    public Patient getPatientById(Long id) {
-        return patientRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid patient ID: " + id));
-    }
-
-    public Patient savePatient(Patient patient) {
-        return patientRepository.save(patient);
-    }
-
-    public void deletePatient(Long id) {
-        patientRepository.deleteById(id);
-    }
-}
+import com.shms.entity.Patient;import com.shms.repository.PatientRepository;import org.springframework.stereotype.Service;import java.util.List;
+@Service public class PatientService{private final PatientRepository repo;public PatientService(PatientRepository r){repo=r;}public List<Patient> getAllPatients(){return repo.findAll();}public Patient getPatientById(Long id){return repo.findById(id).orElseThrow(()->new IllegalArgumentException("Invalid patient ID: "+id));}public Patient savePatient(Patient p){return repo.save(p);}public void deletePatient(Long id){repo.deleteById(id);}}
