@@ -15,6 +15,9 @@ import java.util.Optional;
 public class AuthService {
  private final UserRepository users; private final PatientRepository patients; private final RoleRepository roles; private final PasswordEncoder encoder;
  public AuthService(UserRepository users,PatientRepository patients,RoleRepository roles,PasswordEncoder encoder){this.users=users;this.patients=patients;this.roles=roles;this.encoder=encoder;}
+ @Transactional
+ public void updateLastLogin(User user){ users.save(user); }
+
  public Optional<User> authenticate(String email,String password){
    return users.findByEmailIgnoreCase(email).filter(u -> u.getStatus()==User.Status.ACTIVE && password!=null && u.getPassword()!=null && encoder.matches(password,u.getPassword()));
  }

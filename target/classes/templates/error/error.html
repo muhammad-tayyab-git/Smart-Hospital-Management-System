@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title ?: 'Error'} + ' | Smart Hospital'">Error | Smart Hospital</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <style>
+        .error-shell{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#f4f8ff,#eefcf8)}
+        .error-card{width:min(620px,100%);background:#fff;border:1px solid #e7edf5;border-radius:24px;padding:42px;box-shadow:0 20px 60px rgba(20,40,80,.10);text-align:center}
+        .error-code{font-size:72px;line-height:1;font-weight:800;color:#1d6ef2;margin-bottom:12px}
+        .error-card h1{margin:0 0 12px}.error-card p{color:#64748b;margin:0 auto 26px;max-width:480px}
+        .error-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.error-actions a{min-width:130px}
+    </style>
+</head>
+<body>
+<div class="error-shell">
+    <main class="error-card">
+        <div class="error-code" th:text="${status ?: 500}">500</div>
+        <h1 th:text="${title ?: 'Something went wrong'}">Something went wrong</h1>
+        <p th:text="${message ?: 'Please try again or return to the home page.'}">Please try again or return to the home page.</p>
+        <div class="error-actions">
+            <a class="btn btn-primary" href="/home">Back to home</a>
+            <a class="btn btn-outline-primary" href="javascript:history.back()">Go back</a>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -10,11 +10,13 @@ public class Invoice {
  @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id;
  @Column(name="invoice_number",nullable=false,unique=true) private String invoiceNumber;
  @ManyToOne(fetch=FetchType.EAGER) @JoinColumn(name="patient_id",nullable=false) private Patient patient;
- @ManyToOne(fetch=FetchType.EAGER) @JoinColumn(name="appointment_id") private AppointmentSlot appointment;
+ @ManyToOne(fetch=FetchType.EAGER) @JoinColumn(name="appointment_id") private Appointment appointment;
  @Column(name="issue_date",nullable=false) private LocalDate issueDate;
  @Column(name="due_date") private LocalDate dueDate;
- private BigDecimal subtotal=BigDecimal.ZERO, discount=BigDecimal.ZERO, tax=BigDecimal.ZERO;
- @Column(name="total_amount") private BigDecimal totalAmount=BigDecimal.ZERO;
+ @Column(precision=12, scale=2) private BigDecimal subtotal=BigDecimal.ZERO;
+ @Column(precision=12, scale=2) private BigDecimal discount=BigDecimal.ZERO;
+ @Column(precision=12, scale=2) private BigDecimal tax=BigDecimal.ZERO;
+ @Column(name="total_amount", precision=12, scale=2) private BigDecimal totalAmount=BigDecimal.ZERO;
  @Enumerated(EnumType.STRING) private Status status=Status.DRAFT;
  @Column(name="created_at") private LocalDateTime createdAt;
  @Column(name="updated_at") private LocalDateTime updatedAt;
@@ -24,7 +26,7 @@ public class Invoice {
  public Long getId(){return id;} public void setId(Long v){id=v;}
  public String getInvoiceNumber(){return invoiceNumber;} public void setInvoiceNumber(String v){invoiceNumber=v;}
  public Patient getPatient(){return patient;} public void setPatient(Patient v){patient=v;}
- public AppointmentSlot getAppointment(){return appointment;} public void setAppointment(AppointmentSlot v){appointment=v;}
+ public Appointment getAppointment(){return appointment;} public void setAppointment(Appointment v){appointment=v;}
  public LocalDate getIssueDate(){return issueDate;} public void setIssueDate(LocalDate v){issueDate=v;}
  public LocalDate getDueDate(){return dueDate;} public void setDueDate(LocalDate v){dueDate=v;}
  public BigDecimal getSubtotal(){return subtotal;} public void setSubtotal(BigDecimal v){subtotal=v;}

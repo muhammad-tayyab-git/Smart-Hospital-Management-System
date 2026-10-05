@@ -10,10 +10,9 @@ CREATE DATABASE smart_hospital
 
 USE smart_hospital;
 
--- Application database user (local/development only)
-CREATE USER IF NOT EXISTS 'shms_user'@'%' IDENTIFIED BY 'ChangeThisPassword123!';
-GRANT ALL PRIVILEGES ON smart_hospital.* TO 'shms_user'@'%';
-FLUSH PRIVILEGES;
+-- Application DB users are intentionally not created by this schema script.
+-- Create a least-privilege account separately for your environment and provide
+-- its credentials through DB_USERNAME / DB_PASSWORD.
 
 SET FOREIGN_KEY_CHECKS = 0;
 

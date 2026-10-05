@@ -10,9 +10,9 @@ public class Doctor {
     @ManyToOne(fetch=FetchType.EAGER) @JoinColumn(name="department_id", nullable=false) private Department department;
     private String specialization;
     private String qualification;
-    @Column(name="license_number") private String licenseNumber;
+    @Column(name="license_number", unique=true) private String licenseNumber;
     @Column(name="experience_years") private Integer experienceYears=0;
-    @Column(name="consultation_fee") private java.math.BigDecimal consultationFee=java.math.BigDecimal.ZERO;
+    @Column(name="consultation_fee", precision=10, scale=2) private java.math.BigDecimal consultationFee=java.math.BigDecimal.ZERO;
     @Column(name="bio", columnDefinition="TEXT") private String bio;
     @Enumerated(EnumType.STRING) private Status status=Status.ACTIVE;
     @Column(name="created_at") private java.time.LocalDateTime createdAt;

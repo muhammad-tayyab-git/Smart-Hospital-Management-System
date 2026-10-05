@@ -1,0 +1,8 @@
+package com.shms.entity;
+import jakarta.persistence.*; import java.time.*;
+@Entity @Table(name="lab_orders") public class LabOrder {
+ @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id; @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="patient_id",nullable=false) private Patient patient; @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="doctor_id",nullable=false) private Doctor doctor; @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="appointment_id") private Appointment appointment;
+ @Column(name="test_name",nullable=false) private String testName; @Enumerated(EnumType.STRING) private Priority priority=Priority.NORMAL; @Enumerated(EnumType.STRING) private Status status=Status.ORDERED; @Column(name="ordered_at") private LocalDateTime orderedAt;
+ public enum Priority{NORMAL,URGENT,STAT} public enum Status{ORDERED,SAMPLE_COLLECTED,PROCESSING,COMPLETED,CANCELLED} @PrePersist void pre(){orderedAt=LocalDateTime.now();}
+ public Long getId(){return id;} public void setId(Long v){id=v;} public Patient getPatient(){return patient;} public void setPatient(Patient v){patient=v;} public Doctor getDoctor(){return doctor;} public void setDoctor(Doctor v){doctor=v;} public Appointment getAppointment(){return appointment;} public void setAppointment(Appointment v){appointment=v;} public String getTestName(){return testName;} public void setTestName(String v){testName=v;} public Priority getPriority(){return priority;} public void setPriority(Priority v){priority=v;} public Status getStatus(){return status;} public void setStatus(Status v){status=v;} public LocalDateTime getOrderedAt(){return orderedAt;}
+}

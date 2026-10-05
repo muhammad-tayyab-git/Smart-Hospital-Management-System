@@ -1,32 +1,28 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<body>
-<div th:fragment="adminLayout">
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="adminLayout" class="admin-shell" th:if="${session.currentUser != null}">
     <aside id="sidebar" class="admin-sidebar">
-        <a class="admin-brand" th:href="@{/admin-dashboard}">
-            <span class="brand-mark"><i class="bi bi-heart-pulse-fill"></i></span>
-            <span>Smart Hospital</span>
-        </a>
-        <div class="sidebar-label">MAIN MENU</div>
+        <a class="admin-brand" th:href="@{/admin-dashboard}"><span class="brand-mark"><i class="bi bi-heart-pulse-fill"></i></span><span>Smart Hospital</span></a>
+        <div class="sidebar-label">OPERATIONS</div>
         <nav class="nav flex-column">
             <a class="nav-link active" th:href="@{/admin-dashboard}"><i class="bi bi-grid-1x2"></i>Dashboard</a>
             <a class="nav-link" th:href="@{/doctors}"><i class="bi bi-person-badge"></i>Doctors</a>
             <a class="nav-link" th:href="@{/patients}"><i class="bi bi-people"></i>Patients</a>
             <a class="nav-link" th:href="@{/billing/listBills}"><i class="bi bi-receipt"></i>Billing</a>
+            <a class="nav-link" th:href="@{/admin/staff}"><i class="bi bi-person-gear"></i>Staff management</a>
+            <a class="nav-link" th:href="@{/admissions/manage}"><i class="bi bi-hospital"></i>Admissions & beds</a>
+            <a class="nav-link" th:href="@{/billing/listBills}"><i class="bi bi-bar-chart"></i>Reports & billing</a>
         </nav>
-        <div class="sidebar-bottom">
-            <a class="nav-link" th:href="@{/home}"><i class="bi bi-house"></i>Public site</a>
-            <a class="nav-link text-danger" th:href="@{/logout}"><i class="bi bi-box-arrow-right"></i>Sign out</a>
-        </div>
+        <div class="sidebar-label mt-4">SYSTEM</div>
+        <nav class="nav flex-column">
+            <a class="nav-link" th:href="@{/home}"><i class="bi bi-globe2"></i>Public website</a>
+            <a class="nav-link" th:href="@{/profile}"><i class="bi bi-person-circle"></i>My profile</a>
+        </nav>
+        <div class="sidebar-bottom"><a class="nav-link text-danger" th:href="@{/logout}"><i class="bi bi-box-arrow-right"></i>Sign out</a></div>
     </aside>
-
     <header class="admin-topbar">
-        <button id="sidebarToggle" class="btn btn-light d-lg-none border"><i class="bi bi-list fs-5"></i></button>
-        <div class="ms-auto d-flex align-items-center gap-3">
-            <span class="role-chip"><i class="bi bi-shield-check me-1"></i>ADMIN</span>
-            <div class="user-mini"><span class="user-avatar">A</span><span th:text="${session.currentUser.username}">admin</span></div>
-        </div>
+        <button id="sidebarToggle" class="btn btn-light d-lg-none border" type="button"><i class="bi bi-list fs-5"></i></button>
+        <div class="ms-auto d-flex align-items-center gap-3"><span class="role-chip"><i class="bi bi-shield-check me-1"></i>ADMIN</span><div class="user-mini"><span class="user-avatar" th:text="${session.currentUser != null and session.currentUser.firstName != null and !session.currentUser.firstName.isEmpty() ? #strings.substring(session.currentUser.firstName,0,1).toUpperCase() : 'A'}">A</span><span th:text="${session.currentUser != null and session.currentUser.firstName != null ? session.currentUser.firstName : 'Admin'}">Admin</span></div></div>
     </header>
+    <script>
+      document.addEventListener('DOMContentLoaded',()=>{const t=document.getElementById('sidebarToggle'),s=document.getElementById('sidebar'); if(t&&s)t.addEventListener('click',()=>s.classList.toggle('open'));});
+    </script>
 </div>
-</body>
-</html>

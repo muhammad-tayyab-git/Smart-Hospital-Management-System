@@ -1,74 +1,51 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Doctor Dashboard | Smart Hospital</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doctor Workspace | Smart Hospital</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="stylesheet" th:href="@{/css/app.css}">
+<style>
+.doctor-stat{border:1px solid var(--sh-border,#e5e7eb);border-radius:18px;padding:18px;background:#fff;height:100%;box-shadow:0 8px 24px rgba(15,23,42,.05)}
+.doctor-stat .icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#eef6ff;color:#0b5cab;font-size:1.1rem}
+.doctor-stat strong{font-size:1.7rem;line-height:1}
+.action-stack{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.invoice-link{font-size:.82rem;text-decoration:none}
+</style>
 </head>
 <body>
 <div th:replace="fragments/header :: header"></div>
+<main class="page-main"><div class="page-container">
+<div class="hero-panel mb-4"><div><span class="eyebrow text-white">DOCTOR WORKSPACE</span><h1 class="fw-bold mb-2">Dr. <span th:text="${doctor.fullName}">Doctor</span></h1><p class="mb-0 text-white-50" th:text="${doctor.specialization + ' · ' + doctor.department.name}">Specialization</p></div><div class="text-end"><span class="d-block text-white-50 small">Experience</span><strong th:text="${doctor.experience}">8 years</strong></div></div>
 
-<main class="container py-4 py-lg-5">
-    <div class="hero-panel mb-4">
-        <div><span class="eyebrow">DOCTOR PORTAL</span><h1 class="display-6 fw-bold mb-2">Dr. <span th:text="${doctor.fullName}">Doctor</span></h1><p class="mb-0 text-white-50" th:text="${doctor.specialization}">Specialization</p></div>
-        <div class="text-lg-end"><div class="small text-white-50">Experience</div><strong th:text="${doctor.experience}">8 years</strong></div>
-    </div>
+<div class="row g-3 mb-4">
+<div class="col-6 col-lg-3"><div class="doctor-stat"><div class="icon mb-3"><i class="bi bi-calendar-check"></i></div><div class="text-muted small mb-1">Confirmed</div><strong th:text="${confirmedCount}">0</strong></div></div>
+<div class="col-6 col-lg-3"><div class="doctor-stat"><div class="icon mb-3"><i class="bi bi-play-circle"></i></div><div class="text-muted small mb-1">In progress</div><strong th:text="${inProgressCount}">0</strong></div></div>
+<div class="col-6 col-lg-3"><div class="doctor-stat"><div class="icon mb-3"><i class="bi bi-check2-circle"></i></div><div class="text-muted small mb-1">Completed</div><strong th:text="${completedCount}">0</strong></div></div>
+<div class="col-6 col-lg-3"><div class="doctor-stat"><div class="icon mb-3"><i class="bi bi-cash-stack"></i></div><div class="text-muted small mb-1">Consultation fee</div><strong th:text="${'€' + #numbers.formatDecimal(doctor.consultationFee,1,2)}">€0.00</strong></div></div>
+</div>
 
-    <div class="content-card">
-        <div class="section-heading flex-wrap gap-3">
-            <div><span class="eyebrow text-primary">SCHEDULE</span><h4>Appointment slots</h4></div>
-            <form method="get" th:action="@{/doctors/dashboard}" class="d-flex gap-2">
-                <input type="date" id="date" name="date" class="form-control" th:value="${selectedDate}">
-                <button class="btn btn-primary"><i class="bi bi-search me-1"></i>View</button>
-            </form>
-        </div>
+<div class="surface"><div class="surface-body">
+<div class="card-heading flex-wrap gap-3"><div><span class="section-kicker">Patient care</span><h4 class="mb-1">Today's appointments</h4><p class="text-muted mb-0">Manage consultations and generate invoices when visits are completed.</p></div>
+<form method="get" th:action="@{/doctors/dashboard}" class="d-flex gap-2"><input type="date" name="date" class="form-control" th:value="${selectedDate}" required><button class="btn btn-primary"><i class="bi bi-calendar-event me-1"></i>View</button></form></div>
 
-        <div th:if="${slots == null or slots.isEmpty()}" class="empty-state">
-            <i class="bi bi-calendar2-x"></i><p>No slots available for this date.</p>
-        </div>
+<div th:if="${slots == null or slots.isEmpty()}" class="empty-state"><div class="empty-icon"><i class="bi bi-calendar2-x"></i></div><h5>No appointments for this date</h5><p>Choose another date to view your schedule.</p></div>
 
-        <div th:unless="${slots == null or slots.isEmpty()}" class="table-responsive">
-            <table class="table align-middle">
-                <thead><tr><th>Time</th><th>Patient</th><th>Status</th><th class="text-end">Action</th></tr></thead>
-                <tbody>
-                <tr th:each="slot : ${slots}">
-                    <td><strong th:text="${slot.startTime + ' – ' + slot.endTime}">09:00</strong></td>
-                    <td th:text="${slot.patient != null ? slot.patient.fullName : 'Available'}">Available</td>
-                    <td>
-                        <span class="status-pill success" th:if="${slot.attended}">Attended</span>
-                        <span class="status-pill warning" th:if="${slot.booked and !slot.attended}">Booked</span>
-                        <span class="status-pill neutral" th:if="${!slot.booked}" th:text="${slot.available ? 'Available' : 'Disabled'}">Available</span>
-                    </td>
-                    <td class="text-end">
-                        <div th:if="${slot.booked and !slot.attended}" class="d-flex justify-content-end gap-2">
-                            <button class="btn btn-sm btn-success" th:onclick="'markAttended(' + ${slot.id} + ')'"><i class="bi bi-check2 me-1"></i>Attended</button>
-                            <button class="btn btn-sm btn-outline-danger" th:onclick="'cancelAppointment(' + ${slot.id} + ')'">Cancel</button>
-                        </div>
-                        <button th:if="${!slot.booked}" class="btn btn-sm"
-                                th:classappend="${slot.available ? 'btn-outline-danger' : 'btn-outline-success'}"
-                                th:text="${slot.available ? 'Disable' : 'Enable'}"
-                                th:onclick="'toggleSlot(' + ${slot.id} + ')'">Disable</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</main>
+<div th:unless="${slots == null or slots.isEmpty()}" class="table-responsive">
+<table class="table align-middle"><thead><tr><th>Time</th><th>Patient</th><th>Reason</th><th>Status</th><th>Invoice</th><th class="text-end">Actions</th></tr></thead><tbody>
+<tr th:each="a : ${slots}">
+<td><strong th:text="${a.startTime + ' – ' + a.endTime}">09:00 – 09:30</strong><div class="text-muted small" th:text="${a.appointmentNumber}">APT-000</div></td>
+<td><div th:if="${a.patient != null}" class="person-cell"><span class="person-avatar"><i class="bi bi-person"></i></span><div><div class="person-name" th:text="${a.patient.fullName}">Patient</div><div class="person-meta" th:text="${a.patient.patientNumber}">PAT-000001</div></div></div></td>
+<td th:text="${a.reason != null and !a.reason.isBlank() ? a.reason : 'No reason provided'}">No reason provided</td>
+<td><span class="status-pill success" th:if="${a.status.name() == 'COMPLETED'}">Completed</span><span class="status-pill info" th:if="${a.status.name() == 'CONFIRMED'}">Confirmed</span><span class="status-pill warning" th:if="${a.status.name() == 'IN_PROGRESS'}">In progress</span><span class="status-pill danger" th:if="${a.status.name() == 'CANCELLED'}">Cancelled</span><span class="status-pill warning" th:if="${a.status.name() == 'NO_SHOW'}">No show</span></td>
+<td><a th:if="${invoices[a.id] != null}" th:href="@{/billing/view/{id}(id=${invoices[a.id].id})}" class="invoice-link"><i class="bi bi-receipt me-1"></i><span th:text="${invoices[a.id].invoiceNumber}">INV-001</span></a><span th:unless="${invoices[a.id] != null}" class="text-muted small">Generated after completion</span></td>
+<td class="text-end"><div class="action-stack" th:if="${a.patient != null and a.status.name() == 'CONFIRMED'}"><button class="btn btn-sm btn-primary" th:onclick="|postAction('/doctors/start-appointment/${a.id}')|"><i class="bi bi-play-fill me-1"></i>Start</button><button class="btn btn-sm btn-success" th:onclick="|postAction('/doctors/mark-attended/${a.id}')|"><i class="bi bi-check2 me-1"></i>Complete</button><button class="btn btn-sm btn-outline-danger" th:onclick="|postAction('/doctors/cancel-appointment/${a.id}')|"><i class="bi bi-x me-1"></i>Cancel</button></div><div class="action-stack" th:if="${a.patient != null and a.status.name() == 'IN_PROGRESS'}"><button class="btn btn-sm btn-success" th:onclick="|postAction('/doctors/mark-attended/${a.id}')|"><i class="bi bi-check2-circle me-1"></i>Complete & Generate Invoice</button></div><span th:if="${a.status.name() == 'COMPLETED'}" class="text-success small"><i class="bi bi-check-circle me-1"></i>Visit completed</span></td>
+</tr></tbody></table></div>
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<div class="mt-3 p-3 rounded-3 bg-light border"><div class="d-flex gap-2 align-items-start"><i class="bi bi-info-circle text-primary mt-1"></i><div><strong>Billing workflow</strong><div class="small text-muted">Complete a confirmed or in-progress appointment to automatically create one consultation invoice using the doctor's consultation fee. Repeating the action will not create a duplicate invoice.</div></div></div></div>
+</div></div></div></main>
 <script>
-async function postAction(url){
-    try{ const r=await axios.post(url); if(r.data==='success'){location.reload();} else {alert('The action could not be completed.');} }
-    catch(e){console.error(e);alert('Server error. Please try again.');}
-}
-function toggleSlot(id){postAction('/doctors/toggle-slot/'+id)}
-function markAttended(id){postAction('/doctors/mark-attended/'+id)}
-function cancelAppointment(id){postAction('/doctors/cancel-appointment/'+id)}
+async function postAction(url){if(!confirm('Are you sure you want to update this appointment?'))return;try{const r=await fetch(url,{method:'POST'});const text=await r.text();if(text==='success'){location.reload()}else{alert('The action could not be completed. Please refresh and try again.')}}catch(e){alert('Server error. Please try again.')}}
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</body></html>

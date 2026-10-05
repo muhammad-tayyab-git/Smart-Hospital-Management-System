@@ -37,7 +37,16 @@ public class User {
     public LocalDateTime getLastLoginAt(){return lastLoginAt;} public void setLastLoginAt(LocalDateTime v){lastLoginAt=v;}
     public LocalDateTime getCreatedAt(){return createdAt;} public LocalDateTime getUpdatedAt(){return updatedAt;}
     public Set<Role> getRoles(){return roles;} public void setRoles(Set<Role> v){roles=v;}
-    public String getRole(){ return roles.stream().map(Role::getName).findFirst().orElse("PATIENT"); }
+    public String getRole(){
+        if (roles == null || roles.isEmpty()) return "PATIENT";
+        // Roles are normally exclusive. Keep the result deterministic if legacy data contains duplicates.
+        String[] priority = {"ADMIN","DOCTOR","RECEPTIONIST","NURSE","PHARMACIST","LAB_TECHNICIAN","PATIENT"};
+        for (String candidate : priority) {
+            if (roles.stream().anyMatch(r -> candidate.equals(r.getName()))) return candidate;
+        }
+        return "PATIENT";
+    }
+    @Transient public boolean hasRole(String role){ return role != null && role.equals(getRole()); }
     // Backward-compatible view: the application no longer stores usernames.
     @Transient public String getUsername(){return email;}
     public void setUsername(String ignored){ /* username removed in V2 */ }

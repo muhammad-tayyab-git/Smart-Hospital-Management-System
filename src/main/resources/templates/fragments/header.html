@@ -1,83 +1,44 @@
 <div xmlns:th="http://www.thymeleaf.org" th:fragment="header">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" th:href="@{/css/app.css}">
-    <nav class="navbar navbar-expand-lg navbar-dark sh-navbar">
+    <nav class="navbar navbar-expand-lg navbar-dark sh-navbar sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/home}">
                 <span class="brand-mark"><i class="bi bi-heart-pulse-fill"></i></span>
                 Smart Hospital
             </a>
-
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
-                    <li class="nav-item"><a class="nav-link" th:href="@{/home}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/home}"><i class="bi bi-house-door me-1"></i>Home</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/doctors}"><i class="bi bi-person-badge me-1"></i>Doctors</a></li>
+                    <li class="nav-item" th:if="${session.currentUser == null}"><a class="nav-link" href="/home#services">Services</a></li>
+                    <li class="nav-item" th:if="${session.currentUser == null}"><a class="nav-link" href="/home#contact">Contact</a></li>
 
-                    <li class="nav-item" th:if="${session.currentUser == null or session.currentUser.role == 'PATIENT'}">
-                        <a class="nav-link" th:href="@{/doctors}">Doctors</a>
-                    </li>
+                    <li class="nav-item" th:if="${session.currentUser?.role == 'PATIENT'}"><a class="nav-link" th:href="@{/appointments/my}"><i class="bi bi-calendar2-check me-1"></i>Appointments</a></li>
+                    <li class="nav-item" th:if="${session.currentUser?.role == 'PATIENT'}"><a class="nav-link" th:href="@{/billing/my}"><i class="bi bi-receipt me-1"></i>My Bills</a></li>
+                    <li class="nav-item" th:if="${session.currentUser?.role == 'PATIENT'}"><a class="nav-link" th:href="@{/patient/health}"><i class="bi bi-heart-pulse me-1"></i>My Health</a></li>
+                    <li class="nav-item" th:if="${session.currentUser != null}"><a class="nav-link" th:href="@{/notifications}"><i class="bi bi-bell me-1"></i>Alerts</a></li>
+                    <li class="nav-item" th:if="${session.currentUser?.role == 'DOCTOR'}"><a class="nav-link" th:href="@{/doctors/dashboard}"><i class="bi bi-calendar2-week me-1"></i>My Schedule</a></li>
+                    <li class="nav-item" th:if="${session.currentUser?.role == 'RECEPTIONIST'}"><a class="nav-link" th:href="@{/reception-dashboard}"><i class="bi bi-grid me-1"></i>Dashboard</a></li>
+                    <li class="nav-item" th:if="${session.currentUser?.role == 'ADMIN'}"><a class="nav-link" th:href="@{/admin-dashboard}"><i class="bi bi-grid me-1"></i>Dashboard</a></li>
+                    <li class="nav-item" th:if="${session.currentUser?.role == 'NURSE' or session.currentUser?.role == 'PHARMACIST' or session.currentUser?.role == 'LAB_TECHNICIAN'}"><a class="nav-link" th:href="@{/staff-dashboard}"><i class="bi bi-grid me-1"></i>Workspace</a></li>
+                    <li class="nav-item" th:if="${session.currentUser?.role == 'LAB_TECHNICIAN'}"><a class="nav-link" th:href="@{/lab/dashboard}"><i class="bi bi-eyedropper me-1"></i>Laboratory</a></li>
+                    <li class="nav-item" th:if="${session.currentUser?.role == 'ADMIN' or session.currentUser?.role == 'RECEPTIONIST' or session.currentUser?.role == 'NURSE'}"><a class="nav-link" th:href="@{/admissions/manage}"><i class="bi bi-hospital me-1"></i>Beds</a></li>
 
-                    <li class="nav-item" th:if="${session.currentUser?.role == 'PATIENT'}">
-                        <a class="nav-link" th:href="@{/appointments/my}">Appointments</a>
-                    </li>
-
-                    <li class="nav-item" th:if="${session.currentUser?.role == 'PATIENT'}">
-                        <a class="nav-link" th:href="@{/billing/my}">My Bills</a>
-                    </li>
-
-                    <li class="nav-item" th:if="${session.currentUser?.role == 'DOCTOR'}">
-                        <a class="nav-link" th:href="@{/doctors/dashboard}">My Schedule</a>
-                    </li>
-
-                    <li class="nav-item" th:if="${session.currentUser?.role == 'RECEPTIONIST'}">
-                        <a class="nav-link" th:href="@{/reception-dashboard}">Dashboard</a>
-                    </li>
-
-                    <li class="nav-item" th:if="${session.currentUser?.role == 'ADMIN'}">
-                        <a class="nav-link" th:href="@{/admin-dashboard}">Dashboard</a>
-                    </li>
-
-                    <li class="nav-item" th:if="${session.currentUser == null}">
-                        <a class="nav-link" href="/home#services">Services</a>
-                    </li>
-
-                    <li class="nav-item" th:if="${session.currentUser == null}">
-                        <a class="nav-link" href="/home#contact">Contact</a>
-                    </li>
-
-                    <li class="nav-item ms-lg-2" th:if="${session.currentUser == null}">
-                        <a class="btn btn-light btn-sm px-3" th:href="@{/login}">Sign in</a>
-                    </li>
-
-                    <li class="nav-item ms-lg-2" th:if="${session.currentUser == null}">
-                        <a class="btn btn-outline-light btn-sm px-3" th:href="@{/register}">Register</a>
-                    </li>
+                    <li class="nav-item ms-lg-2" th:if="${session.currentUser == null}"><a class="btn btn-light btn-sm px-3" th:href="@{/login}">Sign in</a></li>
+                    <li class="nav-item" th:if="${session.currentUser == null}"><a class="btn btn-outline-light btn-sm px-3 ms-lg-1" th:href="@{/register}">Create account</a></li>
 
                     <li class="nav-item dropdown ms-lg-2" th:if="${session.currentUser != null}">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="user-avatar"
-                                  th:text="${#strings.substring(session.currentUser.username,0,1).toUpperCase()}">U</span>
-                            <span th:text="${session.currentUser.username}">User</span>
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="user-avatar user-avatar-light" th:text="${session.currentUser != null and session.currentUser.firstName != null and !session.currentUser.firstName.isEmpty() ? #strings.substring(session.currentUser.firstName,0,1).toUpperCase() : 'U'}">U</span>
+                            <span th:text="${session.currentUser != null and session.currentUser.firstName != null ? session.currentUser.firstName : 'User'}">User</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                            <li><h6 class="dropdown-header" th:text="${session.currentUser.role}">ROLE</h6></li>
-                            <li th:if="${session.currentUser.role == 'ADMIN'}">
-                                <a class="dropdown-item" th:href="@{/admin-dashboard}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
-                            </li>
-                            <li th:if="${session.currentUser.role == 'DOCTOR'}">
-                                <a class="dropdown-item" th:href="@{/doctors/dashboard}"><i class="bi bi-calendar2-week me-2"></i>My schedule</a>
-                            </li>
-                            <li th:if="${session.currentUser.role == 'PATIENT'}">
-                                <a class="dropdown-item" th:href="@{/patient-dashboard}"><i class="bi bi-grid me-2"></i>My portal</a>
-                            </li>
-                            <li th:if="${session.currentUser.role == 'RECEPTIONIST'}">
-                                <a class="dropdown-item" th:href="@{/reception-dashboard}"><i class="bi bi-grid me-2"></i>Dashboard</a>
-                            </li>
+                        <ul class="dropdown-menu dropdown-menu-end user-menu">
+                            <li class="px-3 py-2"><div class="fw-bold" th:text="${session.currentUser.fullName}">User</div><small class="text-muted" th:text="${session.currentUser.email}">email</small><div class="mt-2"><span class="status-pill info" th:text="${session.currentUser.role}">ROLE</span></div></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" th:href="@{/profile}"><i class="bi bi-person-circle me-2"></i>My profile</a></li>
+                            <li th:if="${session.currentUser.role == 'ADMIN'}"><a class="dropdown-item" th:href="@{/admin-dashboard}"><i class="bi bi-speedometer2 me-2"></i>Admin dashboard</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" th:href="@{/logout}"><i class="bi bi-box-arrow-right me-2"></i>Sign out</a></li>
                         </ul>
@@ -86,13 +47,6 @@
             </div>
         </div>
     </nav>
-
-    <style>
-        .brand-mark{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.15);display:grid;place-items:center}
-        .user-avatar{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:.8rem;font-weight:800}
-        .sh-navbar .btn{font-weight:650}
-    </style>
-
-    <div th:if="${success}" class="container pt-3"><div class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}"></div></div>
-    <div th:if="${error}" class="container pt-3"><div class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${error}"></div></div>
+    <div th:if="${success}" class="container pt-3"><div class="alert alert-success border-0 shadow-sm alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div></div>
+    <div th:if="${error}" class="container pt-3"><div class="alert alert-danger border-0 shadow-sm alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-circle me-2"></i><span th:text="${error}"></span><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div></div>
 </div>
